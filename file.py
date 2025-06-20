@@ -49,28 +49,7 @@ uploaded = st.file_uploader("JPEG をアップロード", type=["jpg", "jpeg"])
 if uploaded:
     # 画像読み込み
     orig_img = Image.open(io.BytesIO(uploaded.read()))
-    orig_w, orig_h = orig_img.size
-
-    # 色選択とRGBスライダー
-    st.subheader("色選択")
-    picker_col, preview_col = st.columns([3,1])
-    with picker_col:
-        selected_color = st.color_picker("カラーコードを入力", "#233EF3")
-        r_val, g_val, b_val = [int(selected_color.lstrip("#")[i:i+2], 16) for i in (0, 2, 4)]
-        col_r, col_g, col_b = st.columns(3)
-        r_val = col_r.slider("R", 0, 255, r_val)
-        g_val = col_g.slider("G", 0, 255, g_val)
-        b_val = col_b.slider("B", 0, 255, b_val)
-        display_color = f"#{r_val:02X}{g_val:02X}{b_val:02X}"
-    with preview_col:
-        st.write("選択中の色プレビュー")
-        st.markdown(
-            f"<div style='width:150px;height:150px;border:1px solid #000;background-color:{display_color};'></div>",
-            unsafe_allow_html=True
-        )
-    st.markdown(f"<p style='font-size:18px;'>選択中のカラーコード: <strong>{display_color}</strong></p>", unsafe_allow_html=True)
-
-    # 明るさ／コントラスト調整用スライダー
+    orig_w, orig_h = orig_img.size    # 明るさ／コントラスト調整用スライダー
     st.subheader("画像調整")
     st.write("明るさやコントラストを変えて、画像の変化を見てみよう")
     col1, col2 = st.columns(2)
