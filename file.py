@@ -144,6 +144,8 @@ if uploaded:
     total_kb = w2 * h2 * bytes_per_pixel / 1024
     st.write(f"**問2:** 色数を{colors}色、画像サイズが{w2}×{h2}画素のとき、データ量は何KBでしょうか？")
     with st.expander("解答・解説2"):
+        # 色数をビットに変換
+        st.write(f"色数をビットに変換: 2^{bits} = {colors} 色なので {bits} ビット")
         # ビットで計算し、8で割ってバイトに変換、さらに1024で割ってKBに換算
         total_bits = w2 * h2 * bits
         bytes_val = total_bits / 8
