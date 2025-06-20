@@ -74,12 +74,9 @@ if uploaded:
     # 解像度
     st.subheader("解像度")
     st.write("解像度とは、画像を構成する点（画素）がどれだけ細かく並んでいるかを示す「密度」のことです。解像度の違いによって、同じサイズで表示しても画像がどう変わるか比べてみましょう。")
-    res_cols = st.columns(3)
     # 左から高い解像度（128画素）、中解像度（64画素）、低解像度（16画素）の順に並べて比較
+    res_cols = st.columns(3)
     for col, size in zip(res_cols, [128, 64, 16]):
-        low = img.resize((size, size), Image.BILINEAR)
-        restored = low.resize((orig_w, orig_h), Image.NEAREST)
-        col.image(restored, caption=f"{size}画素 → {orig_w}画素")
         low = img.resize((size, size), Image.BILINEAR)
         restored = low.resize((orig_w, orig_h), Image.NEAREST)
         col.image(restored, caption=f"{size}画素 → {orig_w}画素")
