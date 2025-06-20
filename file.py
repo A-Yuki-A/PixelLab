@@ -148,6 +148,8 @@ if uploaded:
         st.write(f"1画素あたり {bits} ビット ({bytes_per_pixel:.2f} B) を使います。")
         st.write(f"総画素数 {w2}×{h2} = {w2*h2} 画素 × {bytes_per_pixel:.2f} B を計算し、1024で割ってKBに換算します。")
         st.write(f"1画素あたり {bits} ビット ({bytes_per_pixel:.2f} B) を使います。")
+        st.write(f"総画素数 {w2}×{h2} = {w2*h2} 画素 × {bytes_per_pixel:.2f} B を計算し、1024で割ってKBに換算します。")
+        st.write(f"1画素あたり {bits} ビット ({bytes_per_pixel:.2f} B) を使います。")
         st.write(f"総画素数 {w2}×{h2} = {w2*h2} 画素 × {bytes_per_pixel:.2f} B を計算し、1024 で割って KB に換算します。") を使います。
 総画素数 {w2}×{h2} = {w2*h2} 画素 × {bytes_per_pixel:.2f} B を計算し、
 1024 で割って KB に換算します。
