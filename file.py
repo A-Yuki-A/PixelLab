@@ -136,7 +136,7 @@ if uploaded:
         st.write(f"**解答：** {total_px} 画素")
         st.write(f"**解説：** {w} × {h} = {total_px} で計算します。")
 
-    # 問2: データ量の計算（KB単位）
+        # 問2: データ量の計算（KB単位）
     colors = random.choice([2, 4, 8, 16, 32, 64, 128, 256, 512, 1024])
     w2, h2 = random.choice([(50, 50), (80, 80), (100, 60), (120, 80)])
     bits = colors.bit_length() - 1
@@ -145,16 +145,8 @@ if uploaded:
     st.write(f"**問2:** 色数を{colors}色、画像サイズが{w2}×{h2}画素のとき、データ量は何KBでしょうか？")
     with st.expander("解答・解説2"):
         st.write(f"**解答：** {total_kb:.2f} KB")
-        st.write(f"1画素あたり {bits} ビット ({bytes_per_pixel:.2f} B) を使います。")
+        st.write(f"**解説：** 1画素あたり{bits}ビット ({bytes_per_pixel:.2f} B) を使います。")
         st.write(f"総画素数 {w2}×{h2} = {w2*h2} 画素 × {bytes_per_pixel:.2f} B を計算し、1024で割ってKBに換算します。")
-        st.write(f"1画素あたり {bits} ビット ({bytes_per_pixel:.2f} B) を使います。")
-        st.write(f"総画素数 {w2}×{h2} = {w2*h2} 画素 × {bytes_per_pixel:.2f} B を計算し、1024で割ってKBに換算します。")
-        st.write(f"1画素あたり {bits} ビット ({bytes_per_pixel:.2f} B) を使います。")
-        st.write(f"総画素数 {w2}×{h2} = {w2*h2} 画素 × {bytes_per_pixel:.2f} B を計算し、1024 で割って KB に換算します。") を使います。
-総画素数 {w2}×{h2} = {w2*h2} 画素 × {bytes_per_pixel:.2f} B を計算し、
-1024 で割って KB に換算します。
-"""
-        )
 
     # 問3: 色数からビット数の計算（従来問題）
     colors_q1 = random.choice([16, 64, 256, 1024])
