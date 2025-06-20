@@ -167,10 +167,8 @@ if uploaded:
 """
         )
 
-    # 一時ファイルの削除
-        os.remove(in_path)
-    except:
-        pass
+        # 一時ファイルの削除
+    try:
         os.remove(in_path)
     except:
         pass
