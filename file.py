@@ -8,7 +8,7 @@ Original file is located at
 """
 
 import streamlit as st
-from PIL import Image, ImageEnhance  # 画像加工用にImageEnhanceを追加
+from PIL import Image, ImageEnhance
 # Disable DecompressionBombError for large zoom previews
 Image.MAX_IMAGE_PIXELS = None
 import io
@@ -53,21 +53,22 @@ if uploaded:
 
     # 色選択とRGBスライダー
     st.subheader("色選択")
-    # カラーコード入力
-    selected_color = st.color_picker("カラーコードを入力", "#233EF3")
-    # カラーコードをR,G,Bに分解
-    r_val, g_val, b_val = [int(selected_color.lstrip("#")[i:i+2], 16) for i in (0, 2, 4)]
-    col_r, col_g, col_b = st.columns(3)
-    r_val = col_r.slider("R", 0, 255, r_val)
-    g_val = col_g.slider("G", 0, 255, g_val)
-    b_val = col_b.slider("B", 0, 255, b_val)
-    # スライダーで選択した色のプレビュー
-    display_color = f"#{r_val:02X}{g_val:02X}{b_val:02X}"
-    st.markdown(
-        f"<div style='width:100px;height:50px;border:1px solid #000;background-color:{display_color};'></div>  \n"
-        f"選択中のカラーコード: **{display_color}**",
-        unsafe_allow_html=True
-    )
+    picker_col, preview_col = st.columns([3,1])
+    with picker_col:
+        selected_color = st.color_picker("カラーコードを入力", "#233EF3")
+        r_val, g_val, b_val = [int(selected_color.lstrip("#")[i:i+2], 16) for i in (0, 2, 4)]
+        col_r, col_g, col_b = st.columns(3)
+        r_val = col_r.slider("R", 0, 255, r_val)
+        g_val = col_g.slider("G", 0, 255, g_val)
+        b_val = col_b.slider("B", 0, 255, b_val)
+        display_color = f"#{r_val:02X}{g_val:02X}{b_val:02X}"
+    with preview_col:
+        st.write("選択中の色プレビュー")
+        st.markdown(
+            f"<div style='width:150px;height:150px;border:1px solid #000;background-color:{display_color};'></div>",
+            unsafe_allow_html=True
+        )
+    st.markdown(f"<p style='font-size:18px;'>選択中のカラーコード: <strong>{display_color}</strong></p>", unsafe_allow_html=True)
 
     # 明るさ／コントラスト調整用スライダー
     st.subheader("画像調整")
@@ -86,7 +87,7 @@ if uploaded:
     img_col1, img_col2 = st.columns(2)
     img_col1.image(orig_img, caption="Uploaded JPEG")
     img_col2.image(img, caption="Adjusted Image")
-    st.write(f"元画像サイズ: {orig_w}×{orig_h} 画素 = {orig_w*orig_h:,} 総画素数")
+    st.markdown(f"<p style='font-size:18px;'>元画像サイズ: {orig_w}×{orig_h} 画素 = {orig_w*orig_h:,} 総画素数</p>", unsafe_allow_html=True)
 
     # RGBチャンネル分解
     st.subheader("RGBチャンネル分解")
@@ -122,7 +123,9 @@ if uploaded:
         gq = g.point(lambda x: quantize(x))
         bq = b.point(lambda x: quantize(x))
         img_q = Image.merge("RGB", (rq, gq, bq))
-        dcol.image(img_q, caption=f"{tb}ビット（各色{cb}bit）")# ファイルサイズ比較
+        dcol.image(img_q, caption=f"{tb}ビット（各色{cb}bit）")
+
+    # ファイルサイズ比較
     st.subheader("ファイルサイズとJPGの方式")
     with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(uploaded.name)[1]) as tmp:
         img.save(tmp, format=img.format)
@@ -140,20 +143,16 @@ if uploaded:
     st.table(pd.DataFrame(rows).set_index("拡張子"))
     st.write("拡張子によってファイルサイズが違うことを確認してください。")
 
-                # 確認問題（動的出題）
+    # 確認問題（動的出題）
     st.subheader("確認問題")
-
-    # 問題1: 必要ビット数の計算
     colors_q1 = random.choice([16, 64, 256, 1024])
     bits_needed = colors_q1.bit_length() - 1
     st.write(f"**問題1:** 1画素で{colors_q1:,}色を表現するには何ビット必要ですか？")
     with st.expander("解答・解説1"):
         st.write(
-            f"""**解答:** {bits_needed}ビット
-**解説:** 色数は2^ビットで表されます。2^{bits_needed} = {colors_q1}色となるため、{bits_needed}ビット必要です。"""
+            f"**解答:** {bits_needed}ビット\n"
+            f"**解説:** 色数は2^ビットで表されます。2^{bits_needed} = {colors_q1}色となるため、{bits_needed}ビット必要です。"
         )
-
-    # 一時ファイル削除
     try:
         os.remove(in_path)
     except:
