@@ -127,15 +127,42 @@ if uploaded:
 
     # 確認問題（動的出題）
     st.subheader("確認問題")
+
+    # 問1: 画素数の計算
+    w, h = random.choice([(10, 20), (12, 20), (15, 25), (20, 30), (25, 30)])
+    st.write(f"**問1:** 幅が{w}画素、高さが{h}画素の画像があります。総画素数は何画素でしょうか？")
+    with st.expander("解答・解説1"):
+        total_px = w * h
+        st.write(f"**解答:** {total_px} 画素
+**解説:** 幅×高さで計算します。{w}×{h} = {total_px}（画素）")
+
+    # 問2: データ量の計算（KB単位）
+    colors = random.choice([16, 64, 256])
+    w2, h2 = random.choice([(50, 50), (80, 80), (100, 60), (120, 80)])
+    bits = colors.bit_length() - 1
+    bytes_per_pixel = bits / 8
+    total_kb = w2 * h2 * bytes_per_pixel / 1024
+    st.write(f"**問2:** 色数を{colors}色、画像サイズが{w2}×{h2}画素のとき、データ量は何KBでしょうか？")
+    with st.expander("解答・解説2"):
+        st.write(
+            f"**解答:** {total_kb:.2f} KB
+"
+            f"**解説:** 1画素あたり{bits}ビット → {bytes_per_pixel:.2f}バイト。総画素数 {w2*h2} × バイト数を計算し、1024で割ってKBに換算します。"
+        )
+
+    # 問3: 色数からビット数の計算（従来問題）
     colors_q1 = random.choice([16, 64, 256, 1024])
     bits_needed = colors_q1.bit_length() - 1
-    st.write(f"**問題1:** 1画素で{colors_q1:,}色を表現するには何ビット必要ですか？")
-    with st.expander("解答・解説1"):
-        st.write(
-            f"**解答:** {bits_needed}ビット\n"
-            f"**解説:** 色数は2^ビットで表されます。2^{bits_needed} = {colors_q1}色となるため、{bits_needed}ビット必要です。"
-        )
+    st.write(f"**問3:** 1画素で{colors_q1:,}色を表現するには何ビット必要ですか？")
+    with st.expander("解答・解説3"):
+        st.write(f"**解答:** {bits_needed}ビット
+**解説:** 色数は2^ビットで表されます。2^{bits_needed} = {colors_q1}色となるため、{bits_needed}ビット必要です。")
+
+    # 一時ファイルの削除
     try:
+        os.remove(in_path)
+    except:
+        pass
         os.remove(in_path)
     except:
         pass
