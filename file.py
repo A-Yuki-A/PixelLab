@@ -73,7 +73,7 @@ if uploaded:
 
     # 解像度
     st.subheader("解像度")
-    st.write("1インチにいくつの画素があるかをdpiで表します。")
+    st.write("解像度とは1インチ（2.54cm）にいくつの画素が並んでいるかをdpiで表します。")
     # 左から高い解像度（128画素）、中解像度（64画素）、低解像度（16画素）の順に並べて比較
     res_cols = st.columns(3)
     for col, size in zip(res_cols, [128, 64, 16]):
@@ -133,12 +133,8 @@ if uploaded:
     st.write(f"**問1:** 幅が{w}画素、高さが{h}画素の画像があります。総画素数は何画素でしょうか？")
     with st.expander("解答・解説1"):
         total_px = w * h
-        st.write(
-            f"""
-**解答：** {total_px} 画素
-**解説：** {w} × {h} = {total_px} で計算します。
-"""
-        )
+        st.write(f"**解答：** {total_px} 画素")
+        st.write(f"**解説：** {w} × {h} = {total_px} で計算します。")
 
     # 問2: データ量の計算（KB単位）
     colors = random.choice([2, 4, 8, 16, 32, 64, 128, 256, 512, 1024])
@@ -148,10 +144,9 @@ if uploaded:
     total_kb = w2 * h2 * bytes_per_pixel / 1024
     st.write(f"**問2:** 色数を{colors}色、画像サイズが{w2}×{h2}画素のとき、データ量は何KBでしょうか？")
     with st.expander("解答・解説2"):
-        st.write(
-            f"""
-**解答：** {total_kb:.2f} KB
-**解説：** 1画素あたり {bits} ビット ({bytes_per_pixel:.2f} B) を使います。
+        st.write(f"**解答：** {total_kb:.2f} KB")
+        st.write(f"1画素あたり {bits} ビット ({bytes_per_pixel:.2f} B) を使います。")
+        st.write(f"総画素数 {w2}×{h2} = {w2*h2} 画素 × {bytes_per_pixel:.2f} B を計算し、1024 で割って KB に換算します。") を使います。
 総画素数 {w2}×{h2} = {w2*h2} 画素 × {bytes_per_pixel:.2f} B を計算し、
 1024 で割って KB に換算します。
 """
@@ -162,12 +157,8 @@ if uploaded:
     bits_needed = colors_q1.bit_length() - 1
     st.write(f"**問3:** 1画素で{colors_q1:,}色を表現するには何ビット必要ですか？")
     with st.expander("解答・解説3"):
-        st.write(
-            f"""
-**解答：** {bits_needed} ビット
-**解説：** 色数が {colors_q1} = 2^{bits_needed} となるため、{bits_needed} ビットが必要です。
-"""
-        )
+        st.write(f"**解答：** {bits_needed} ビット")
+        st.write(f"**解説：** 色数が {colors_q1} = 2^{bits_needed} となるため、{bits_needed} ビットが必要です。")
 
     # 一時ファイルの削除
     try:
