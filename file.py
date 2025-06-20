@@ -73,9 +73,12 @@ if uploaded:
 
     # 解像度
     st.subheader("解像度")
-    st.write("解像度とは、画像を構成する点（画素）がどれだけ細かく並んでいるかを示す「密度」のことです。解像度の違いによって、同じサイズで表示しても画像がどう変わるか比べてみましょう。")
-    # 左から高い解像度（128画素）、中解像度（64画素）、低解像度（16画素）の順に並べて比較
-    res_cols = st.columns(3)
+    st.write(
+        "解像度とは、画像を構成する点（画素）がどれだけ細かく並んでいるかを示す「密度」のことです。"
+        "解像度は、1インチにいくつの画素があるかをdpiで表します。"
+    )
+    # 左から高い解像度（128画素）、中解像度（64画素）、低解像度（16画素）の順に並べて比較（128画素）、中解像度（64画素）、低解像度（16画素）の順に並べて比較
+    res_cols = st.columns(3)(3)
     for col, size in zip(res_cols, [128, 64, 16]):
         low = img.resize((size, size), Image.BILINEAR)
         restored = low.resize((orig_w, orig_h), Image.NEAREST)
@@ -96,8 +99,8 @@ if uploaded:
         img_q = Image.merge("RGB", (rq, gq, bq))
         dcol.image(img_q, caption=f"{tb}ビット（各色{cb}bit）")
 
-    # ファイルサイズ比較
-    st.subheader("ファイルサイズとJPGの方式")
+    # JPGとのデータ量比較
+    st.subheader("JPGとのデータ量比較")
     with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(uploaded.name)[1]) as tmp:
         img.save(tmp, format=img.format)
         in_path = tmp.name
