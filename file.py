@@ -144,9 +144,14 @@ if uploaded:
     total_kb = w2 * h2 * bytes_per_pixel / 1024
     st.write(f"**問2:** 色数を{colors}色、画像サイズが{w2}×{h2}画素のとき、データ量は何KBでしょうか？")
     with st.expander("解答・解説2"):
-        st.write(f"**解答：** {total_kb:.2f} KB")
-        st.write(f"**解説：** 1画素あたり{bits}ビット ({bytes_per_pixel:.2f} B) を使います。")
-        st.write(f"総画素数 {w2}×{h2} = {w2*h2} 画素 × {bytes_per_pixel:.2f} B を計算し、1024で割ってKBに換算します。")
+        # ビットで計算し、8で割ってバイトに変換、さらに1024で割ってKBに換算
+        total_bits = w2 * h2 * bits
+        bytes_val = total_bits / 8
+        kb_val = bytes_val / 1024
+        st.write(f"**解答：** {kb_val:.2f} KB")
+        st.write(f"**解説：** 総ビット数 = {w2}×{h2}×{bits} = {total_bits} ビット")
+        st.write(f"ビットを8で割ってバイトに変換 = {bytes_val:.2f} B")
+        st.write(f"さらに1024で割ってKBに換算 = {kb_val:.2f} KB")
 
     # 問3: 色数からビット数の計算（従来問題）
     colors_q1 = random.choice([16, 64, 256, 1024])
