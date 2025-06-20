@@ -159,6 +159,7 @@ if uploaded:
     st.write(f"**問3:** 1画素で{colors_q1:,}色を表現するには何ビット必要ですか？")
     with st.expander("解答・解説3"):
         st.write(f"**解答：** {bits_needed} ビット")
+        st.write(f"色数をビットに変換：2^{bits_needed} = {colors_q1} より、ビット数は {bits_needed} です。")
         st.write(f"**解説：** 色数が {colors_q1} = 2^{bits_needed} となるため、{bits_needed} ビットが必要です。")
 
     # 一時ファイルの削除
