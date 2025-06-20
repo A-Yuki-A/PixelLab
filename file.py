@@ -133,8 +133,11 @@ if uploaded:
     st.write(f"**問1:** 幅が{w}画素、高さが{h}画素の画像があります。総画素数は何画素でしょうか？")
     with st.expander("解答・解説1"):
         total_px = w * h
-        st.write(f"**解答:** {total_px} 画素
-**解説:** 幅×高さで計算します。{w}×{h} = {total_px}（画素）")
+        st.write(
+            f"**解答:** {total_px} 画素
+"
+            f"**解説:** 幅×高さで計算します。{w}×{h} = {total_px}（画素）"
+        )
 
     # 問2: データ量の計算（KB単位）
     colors = random.choice([16, 64, 256])
@@ -155,11 +158,13 @@ if uploaded:
     bits_needed = colors_q1.bit_length() - 1
     st.write(f"**問3:** 1画素で{colors_q1:,}色を表現するには何ビット必要ですか？")
     with st.expander("解答・解説3"):
-        st.write(f"**解答:** {bits_needed}ビット
-**解説:** 色数は2^ビットで表されます。2^{bits_needed} = {colors_q1}色となるため、{bits_needed}ビット必要です。")
+        st.write(
+            f"**解答:** {bits_needed}ビット
+"
+            f"**解説:** 色数は2^ビットで表されます。2^{bits_needed} = {colors_q1}色となるため、{bits_needed}ビット必要です。"
+        )
 
     # 一時ファイルの削除
-    try:
         os.remove(in_path)
     except:
         pass
