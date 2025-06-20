@@ -78,7 +78,7 @@ if uploaded:
         "解像度は、1インチにいくつの画素があるかをdpiで表します。"
     )
     # 左から高い解像度（128画素）、中解像度（64画素）、低解像度（16画素）の順に並べて比較（128画素）、中解像度（64画素）、低解像度（16画素）の順に並べて比較
-    res_cols = st.columns(3)(3)
+    res_cols = st.columns(3)
     for col, size in zip(res_cols, [128, 64, 16]):
         low = img.resize((size, size), Image.BILINEAR)
         restored = low.resize((orig_w, orig_h), Image.NEAREST)
