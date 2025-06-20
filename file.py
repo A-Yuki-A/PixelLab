@@ -8,7 +8,7 @@ Original file is located at
 """
 
 import streamlit as st
-from PIL import Image, ImageEnhance
+from PIL import Image, ImageEnhance  # 画像加工用にImageEnhanceを追加
 # Disable DecompressionBombError for large zoom previews
 Image.MAX_IMAGE_PIXELS = None
 import io
@@ -50,6 +50,24 @@ if uploaded:
     # 画像読み込み
     orig_img = Image.open(io.BytesIO(uploaded.read()))
     orig_w, orig_h = orig_img.size
+
+    # 色選択とRGBスライダー
+    st.subheader("色選択")
+    # カラーコード入力
+    selected_color = st.color_picker("カラーコードを入力", "#233EF3")
+    # カラーコードをR,G,Bに分解
+    r_val, g_val, b_val = [int(selected_color.lstrip("#")[i:i+2], 16) for i in (0, 2, 4)]
+    col_r, col_g, col_b = st.columns(3)
+    r_val = col_r.slider("R", 0, 255, r_val)
+    g_val = col_g.slider("G", 0, 255, g_val)
+    b_val = col_b.slider("B", 0, 255, b_val)
+    # スライダーで選択した色のプレビュー
+    display_color = f"#{r_val:02X}{g_val:02X}{b_val:02X}"
+    st.markdown(
+        f"<div style='width:100px;height:50px;border:1px solid #000;background-color:{display_color};'></div>  \n"
+        f"選択中のカラーコード: **{display_color}**",
+        unsafe_allow_html=True
+    )
 
     # 明るさ／コントラスト調整用スライダー
     st.subheader("画像調整")
@@ -94,7 +112,6 @@ if uploaded:
     # 階調（量子化ビット数）
     st.subheader("階調（量子化ビット数）")
     st.write("階調（量子化ビット数）はRGBそれぞれを何ビットで表現するかを表しています。ビット数が減ると、画像がどのように変化しているか確認してください。※通常は赤・緑・青それぞれに8bit（256色）を割り当て、色を表現しています。")
-
     depth_cols = st.columns(3)
     channel_bits = [5, 3, 2]
     total_bits = [15, 9, 6]
@@ -105,56 +122,37 @@ if uploaded:
         gq = g.point(lambda x: quantize(x))
         bq = b.point(lambda x: quantize(x))
         img_q = Image.merge("RGB", (rq, gq, bq))
-        dcol.image(img_q, caption=f"{tb}ビット（各色{cb}bit）")
-
-    # 拡張子変換と色表現の比較
-    st.subheader("拡張子変換と色表現の比較")
-    st.write("GIFは256色制限により色の階調が減少します。拡大表示とパレットを見て違いを確認しましょう。")
-    fmt_cols = st.columns(3)
-    crop = min(orig_w, orig_h) // 4
-    box = ((orig_w-crop)//2, (orig_h-crop)//2, (orig_w+crop)//2, (orig_h+crop)//2)
-    zoom_factor = 300; max_dim = 2000
-    for col, (ext, fmt) in zip(fmt_cols, [("bmp","BMP"),("png","PNG"),("gif","GIF")]):
-        buf = io.BytesIO()
-        if ext=="gif":
-            pal = img.convert("P", palette=Image.ADAPTIVE, colors=256)
-            pal.save(buf, format=fmt)
-        else:
-            img.save(buf, format=fmt)
-        buf.seek(0)
-        img_ext = Image.open(buf)
-        region = img_ext.crop(box)
-        dim = min(crop*zoom_factor, max_dim)
-        zoom = region.resize((dim, dim), Image.NEAREST)
-        col.image(zoom, caption=f"{ext.upper()} ズーム (×{zoom_factor})")
-
-    # ファイルサイズ比較
+        dcol.image(img_q, caption=f"{tb}ビット（各色{cb}bit）")# ファイルサイズ比較
     st.subheader("ファイルサイズとJPGの方式")
     with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(uploaded.name)[1]) as tmp:
         img.save(tmp, format=img.format)
         in_path = tmp.name
     orig_size = os.path.getsize(in_path)
     sizes = {"jpg": orig_size}
-    for ext, fmt in [("bmp","BMP"),("png","PNG"),("gif","GIF")]:
+    for ext, fmt in [("bmp", "BMP"), ("png", "PNG"), ("gif", "GIF")]:
         buf = io.BytesIO(); img.save(buf, format=fmt)
         sizes[ext] = len(buf.getvalue())
     comp = {"JPG": "非可逆", "PNG": "可逆", "GIF": "可逆", "BMP": "非圧縮"}
     rows = []
     for e, s in sizes.items():
-        kb = s/1024; dk = (s-orig_size)/1024
+        kb = s / 1024; dk = (s - orig_size) / 1024
         rows.append({"拡張子": e.upper(), "方式": comp[e.upper()], "サイズ(バイト)": f"{s:,} バイト", "サイズ(KB)": f"{kb:,.2f} KB", "差分(KB)": f"{dk:+.2f} KB"})
     st.table(pd.DataFrame(rows).set_index("拡張子"))
     st.write("拡張子によってファイルサイズが違うことを確認してください。")
 
-    # 確認問題（動的出題）
+                # 確認問題（動的出題）
     st.subheader("確認問題")
+
     # 問題1: 必要ビット数の計算
     colors_q1 = random.choice([16, 64, 256, 1024])
     bits_needed = colors_q1.bit_length() - 1
     st.write(f"**問題1:** 1画素で{colors_q1:,}色を表現するには何ビット必要ですか？")
     with st.expander("解答・解説1"):
-        st.write(f"""**解答:** {bits_needed}ビット
-**解説:** 色数は2^ビットで表されます。2^{bits_needed} = {colors_q1}色となるため、{bits_needed}ビット必要です。""")
+        st.write(
+            f"""**解答:** {bits_needed}ビット
+**解説:** 色数は2^ビットで表されます。2^{bits_needed} = {colors_q1}色となるため、{bits_needed}ビット必要です。"""
+        )
+
     # 一時ファイル削除
     try:
         os.remove(in_path)
