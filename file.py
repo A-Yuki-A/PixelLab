@@ -75,22 +75,24 @@ if uploaded:
     ch_cols[1].image(green_img, caption="G (緑)")
     ch_cols[2].image(blue_img, caption="B (青)")
 
-    # 解像度比較
-    st.subheader("解像度のシミュレーション")
-    st.write("DPI の違いが印刷時の滑らかさにどのように影響するかをシミュレーションします。")
-    dpi_values = [72, 150, 300]
-    dpi_cols = st.columns(3)
-    # 物理幅を 2 インチとしてシミュレーション
-    physical_width_inch = 2
-    for col, dpi in zip(dpi_cols, dpi_values):
-        # ダウンサンプルしてアップサンプル
-        target_width = int(dpi * physical_width_inch)
+    # # ディスプレイ解像度のシミュレーション
+    st.subheader("ディスプレイ解像度のシミュレーション")
+    st.write("異なるPPI（ピクセル密度）が同じサイズのディスプレイで画像表示にどう影響するかをシミュレーションします。")
+    ppi_values = [96, 150, 300]
+    ppi_labels = ["一般的なPCモニタ (96 PPI)", "高解像度ノートPC (150 PPI)", "スマートフォン (300 PPI)"]
+    ppi_cols = st.columns(3)
+    physical_width_cm = 10  # 10cm幅で表示を想定
+    physical_width_inch = physical_width_cm / 2.54
+    for col, ppi, label in zip(ppi_cols, ppi_values, ppi_labels):
+        # PPIに応じて解像度をシミュレート
+        target_width = int(ppi * physical_width_inch)
         target_height = int(target_width * orig_h / orig_w)
+        # 画像を一度縮小して拡大
         small = img.resize((target_width, target_height), Image.BILINEAR)
         restored = small.resize((orig_w, orig_h), Image.NEAREST)
         col.image(
             restored,
-            caption=f"{dpi} DPI で仮想的に {target_width}×{target_height} px に縮小し、元サイズに戻した場合",
+            caption=f"{label} での見え方",
             use_container_width=True
         )
 
