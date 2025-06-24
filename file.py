@@ -91,7 +91,7 @@ if uploaded:
         col.image(
             restored,
             caption=f"{dpi} DPI で仮想的に {target_width}×{target_height} px に縮小し、元サイズに戻した場合",
-            use_column_width=True
+            use_container_width=True
         )
 
     # 階調（量子化ビット数）（量子化ビット数）
