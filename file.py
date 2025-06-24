@@ -74,7 +74,7 @@ if uploaded:
 
     # ディスプレイ解像度のシミュレーション
     st.subheader("ディスプレイ解像度のシミュレーション")
-    st.write("同じ表示サイズで、低・中・高解像度モニタの違いを比較します。数値を大きく変えて、違いを体感しましょう。")
+    st.write("1インチ（2.54cm）あたりのピクセル数(PPI)が異なると、同じ表示サイズでも見え方が変わります。")
     ppi_values = [10, 50, 200]
     ppi_labels = ["低解像度 (10 PPI)", "中解像度 (50 PPI)", "高解像度 (200 PPI)"]
     ppi_cols = st.columns(3)
@@ -127,32 +127,25 @@ if uploaded:
 
     # 確認問題（動的出題）
     st.subheader("確認問題")
-    q_cols = st.columns(3)
-
     # 問1
-    with q_cols[0]:
-        w,h = random.choice([(10,20),(12,20),(15,25)])
-        st.write(f"**問1:** {w}×{h} 画素の画像の総画素数は？")
-        with st.expander("解答・解説1"):
-            st.write(f"{w}×{h}={w*h} 画素")
-
+    w,h = random.choice([(10,20),(12,20),(15,25)])
+    st.write(f"**問1:** {w}×{h} 画素の画像の総画素数は？")
+    with st.expander("解答・解説1"):
+        st.write(f"{w}×{h}={w*h} 画素")
     # 問2: ビット数
-    with q_cols[1]:
-        c = random.choice([16,64,256,1024])
-        b = c.bit_length()-1
-        st.write(f"**問2:** 1画素で{c}色を表現するには何ビット必要？")
-        with st.expander("解答・解説2"):
-            st.write(f"2^{b}={c} より {b}ビットが必要")
-
+    c = random.choice([16,64,256,1024])
+    b = c.bit_length()-1
+    st.write(f"**問2:** 1画素で{c}色を表現するには何ビット必要？")
+    with st.expander("解答・解説2"):
+        st.write(f"2^{b}={c} より {b}ビットが必要")
     # 問3: データ量
-    with q_cols[2]:
-        cols_num = random.choice([2,4,8,16,32])
-        w2,h2 = random.choice([(50,50),(80,80),(100,60)])
-        bits2 = cols_num.bit_length()-1
-        kb = w2*h2*bits2/8/1024
-        st.write(f"**問3:** {w2}×{h2}画素, {cols_num}色の画像のデータ量(KB)は？")
-        with st.expander("解答・解説3"):
-            st.write(f"総ビット数={w2*h2*bits2} → バイト={w2*h2*bits2/8:.2f} → KB={kb:.2f}")
+    cols_num = random.choice([2,4,8,16,32])
+    w2,h2 = random.choice([(50,50),(80,80),(100,60)])
+    bits2 = cols_num.bit_length()-1
+    kb = w2*h2*bits2/8/1024
+    st.write(f"**問3:** {w2}×{h2}画素, {cols_num}色の画像のデータ量(KB)は？")
+    with st.expander("解答・解説3"):
+        st.write(f"総ビット数={w2*h2*bits2} → バイト={w2*h2*bits2/8:.2f} → KB={kb:.2f}")
 
     # 一時ファイル削除
     try: os.remove(in_p)
