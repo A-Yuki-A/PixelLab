@@ -53,7 +53,7 @@ if uploaded:
     img = ImageEnhance.Brightness(img).enhance(brightness)
     img = ImageEnhance.Contrast(img).enhance(contrast)
 
-    # 比較表示
+    # オリジナルと調整後
     st.subheader("オリジナル と 調整後 の比較")
     img_col1, img_col2 = st.columns(2)
     img_col1.image(orig_img, caption="Uploaded JPEG")
@@ -68,132 +68,92 @@ if uploaded:
     st.write("RGBの画像を合成して、カラー画像が表示されます。")
     r, g, b = img.split()
     ch_cols = st.columns(3)
-    red_img = Image.merge("RGB", (r, Image.new("L", img.size), Image.new("L", img.size)))
-    green_img = Image.merge("RGB", (Image.new("L", img.size), g, Image.new("L", img.size)))
-    blue_img = Image.merge("RGB", (Image.new("L", img.size), Image.new("L", img.size), b))
-    ch_cols[0].image(red_img, caption="R (赤)")
-    ch_cols[1].image(green_img, caption="G (緑)")
-    ch_cols[2].image(blue_img, caption="B (青)")
+    ch_cols[0].image(Image.merge("RGB", (r, Image.new("L", img.size), Image.new("L", img.size))), caption="R (赤)")
+    ch_cols[1].image(Image.merge("RGB", (Image.new("L", img.size), g, Image.new("L", img.size))), caption="G (緑)")
+    ch_cols[2].image(Image.merge("RGB", (Image.new("L", img.size), Image.new("L", img.size), b)), caption="B (青)")
 
-    # # ディスプレイ解像度のシミュレーション
+    # ディスプレイ解像度のシミュレーション
     st.subheader("ディスプレイ解像度のシミュレーション")
-    st.write("異なるPPI（ピクセル密度）が同じサイズのディスプレイで画像表示にどう影響するかをシミュレーションします。")
-    ppi_values = [96, 150, 300]
-    ppi_labels = ["一般的なPCモニタ (96 PPI)", "高解像度ノートPC (150 PPI)", "スマートフォン (300 PPI)"]
+    st.write("同じ表示サイズで、低・中・高解像度モニタの違いを比較します。数値を大きく変えて、違いを体感しましょう。")
+    ppi_values = [10, 50, 200]
+    ppi_labels = ["低解像度 (10 PPI)", "中解像度 (50 PPI)", "高解像度 (200 PPI)"]
     ppi_cols = st.columns(3)
-    physical_width_cm = 10  # 10cm幅で表示を想定
-    physical_width_inch = physical_width_cm / 2.54
+    display_cm = 10  # 表示幅10cm
+    inch = display_cm / 2.54
     for col, ppi, label in zip(ppi_cols, ppi_values, ppi_labels):
-        # PPIに応じて解像度をシミュレート
-        target_width = int(ppi * physical_width_inch)
-        target_height = int(target_width * orig_h / orig_w)
-        # 画像を一度縮小して拡大
-        small = img.resize((target_width, target_height), Image.BILINEAR)
+        w_ppi = int(ppi * inch)
+        h_ppi = int(w_ppi * orig_h / orig_w)
+        small = img.resize((w_ppi, h_ppi), Image.BILINEAR)
         restored = small.resize((orig_w, orig_h), Image.NEAREST)
-        col.image(
-            restored,
-            caption=f"{label} での見え方",
-            use_container_width=True
-        )
+        col.image(restored, caption=label, use_container_width=True)
 
-    # 階調（量子化ビット数）（量子化ビット数）
+    # 階調（量子化ビット数）
     st.subheader("階調（量子化ビット数）")
     st.write(
-        "階調（量子化ビット数）はRGBそれぞれを何ビットで表現するかを表しています。"
-        "ビット数が減ると、画像がどのように変化しているか確認してください。"
-        "※通常は赤・緑・青それぞれに8bit（256色）を割り当て、色を表現しています。"
+        "RGBの各色を何ビットで表現するかを示します。ビット数を減らすと、色の滑らかさが変化します。"
     )
     depth_cols = st.columns(3)
-    channel_bits = [5, 3, 2]
-    total_bits = [15, 9, 6]
-    for dcol, cb, tb in zip(depth_cols, channel_bits, total_bits):
-        def quantize(x, bits=cb):
-            return ((x >> (8-bits)) << (8-bits))
-        rq = r.point(lambda x: quantize(x))
-        gq = g.point(lambda x: quantize(x))
-        bq = b.point(lambda x: quantize(x))
-        img_q = Image.merge("RGB", (rq, gq, bq))
-        dcol.image(img_q, caption=f"{tb}ビット（各色{cb}bit）")
+    for col, bits in zip(depth_cols, [5, 3, 2]):
+        def q(x, b=bits): return ((x >> (8-b)) << (8-b))
+        r_q = r.point(lambda px: q(px))
+        g_q = g.point(lambda px: q(px))
+        b_q = b.point(lambda px: q(px))
+        col.image(Image.merge("RGB", (r_q, g_q, b_q)), caption=f"{bits*3}ビット（各色{bits}bit）")
 
     # ファイル形式の特徴
     st.subheader("ファイル形式の特徴")
-    df_formats = pd.DataFrame([
+    df_f = pd.DataFrame([
         {"拡張子": "JPG", "用途": "写真", "特徴": "非可逆圧縮で自然画像に最適"},
-        {"拡張子": "PNG", "用途": "イラスト、透過画像", "特徴": "可逆圧縮で透過対応"},
+        {"拡張子": "PNG", "用途": "イラスト・透過画像", "特徴": "可逆圧縮で透過対応"},
         {"拡張子": "GIF", "用途": "アニメーション", "特徴": "可逆圧縮で256色まで"},
         {"拡張子": "BMP", "用途": "非圧縮保存", "特徴": "シンプルな非圧縮フォーマット"},
     ])
-    st.table(df_formats.set_index("拡張子"))
+    st.table(df_f.set_index("拡張子"))
 
     # JPGとのデータ量比較
     st.subheader("JPGとのデータ量比較")
-    with tempfile.NamedTemporaryFile(
-            delete=False,
-            suffix=os.path.splitext(uploaded.name)[1]
-        ) as tmp:
+    with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(uploaded.name)[1]) as tmp:
         img.save(tmp, format=img.format)
-        in_path = tmp.name
-    orig_size = os.path.getsize(in_path)
-    sizes = {"jpg": orig_size}
-    for ext, fmt in [("bmp", "BMP"), ("png", "PNG"), ("gif", "GIF")]:
-        buf = io.BytesIO()
-        img.save(buf, format=fmt)
+        in_p = tmp.name
+    orig_s = os.path.getsize(in_p)
+    sizes = {"JPG": orig_s}
+    for ext, fmt in [("PNG","PNG"),("GIF","GIF"),("BMP","BMP")]:
+        buf = io.BytesIO(); img.save(buf, format=fmt)
         sizes[ext] = len(buf.getvalue())
-    comp = {"JPG": "非可逆", "PNG": "可逆", "GIF": "可逆", "BMP": "非圧縮"}
+    comp = {"JPG":"非可逆","PNG":"可逆","GIF":"可逆","BMP":"非圧縮"}
     rows = []
-    for e, s in sizes.items():
-        kb = s / 1024
-        dk = (s - orig_size) / 1024
-        rows.append({
-            "拡張子": e.upper(),
-            "方式": comp[e.upper()],
-            "サイズ(バイト)": f"{s:,} バイト",
-            "サイズ(KB)": f"{kb:,.2f} KB",
-            "差分(KB)": f"{dk:+.2f} KB"
-        })
-    st.table(pd.DataFrame(rows).set_index("拡張子"))
-    st.write("拡張子によってファイルサイズが違うことを確認してください。")
+    for e, s in sizes.items(): rows.append({"形式":e,"方式":comp[e],"サイズ(KB)":f"{s/1024:.2f}"})
+    st.table(pd.DataFrame(rows).set_index("形式"))
 
     # 確認問題（動的出題）
     st.subheader("確認問題")
+    q_cols = st.columns(3)
 
     # 問1
-    w, h = random.choice([(10, 20), (12, 20), (15, 25), (20, 30), (25, 30)])
-    st.write(f"**問1:** 幅が{w}画素、高さが{h}画素の画像があります。総画素数は何画素でしょうか？")
-    with st.expander("解答・解説1"):
-        total_px = w * h
-        st.write(f"**解答：** {total_px} 画素")
-        st.write(f"**解説：** {w} × {h} = {total_px} で計算します。")
+    with q_cols[0]:
+        w,h = random.choice([(10,20),(12,20),(15,25)])
+        st.write(f"**問1:** {w}×{h} 画素の画像の総画素数は？")
+        with st.expander("解答・解説1"):
+            st.write(f"{w}×{h}={w*h} 画素")
 
-    # 問2
-    colors = random.choice([2, 4, 8, 16, 32, 64, 128, 256, 512, 1024])
-    w2, h2 = random.choice([(50, 50), (80, 80), (100, 60), (120, 80)])
-    bits = colors.bit_length() - 1
-    bytes_per_pixel = bits / 8
-    total_kb = w2 * h2 * bytes_per_pixel / 1024
-    st.write(f"**問2:** 色数を{colors}色、画像サイズが{w2}×{h2}画素のとき、データ量は何KBでしょうか？")
-    with st.expander("解答・解説2"):
-        # 色数をビットに変換
-        st.write(f"色数をビットに変換: 2^{bits} = {colors} 色なので {bits} ビット")
-        total_bits = w2 * h2 * bits
-        bytes_val = total_bits / 8
-        kb_val = bytes_val / 1024
-        st.write(f"**解答：** {kb_val:.2f} KB")
-        st.write(f"**解説：** 総ビット数 = {w2}×{h2}×{bits} = {total_bits} ビット")
-        st.write(f"ビットを8で割ってバイトに変換 = {bytes_val:.2f} B")
-        st.write(f"さらに1024で割ってKBに換算 = {kb_val:.2f} KB")
+    # 問2: ビット数
+    with q_cols[1]:
+        c = random.choice([16,64,256,1024])
+        b = c.bit_length()-1
+        st.write(f"**問2:** 1画素で{c}色を表現するには何ビット必要？")
+        with st.expander("解答・解説2"):
+            st.write(f"2^{b}={c} より {b}ビットが必要")
 
-    # 問3
-    colors_q1 = random.choice([16, 64, 256, 1024])
-    bits_needed = colors_q1.bit_length() - 1
-    st.write(f"**問3:** 1画素で{colors_q1:,}色を表現するには何ビット必要ですか？")
-    with st.expander("解答・解説3"):
-        st.write(f"**解答：** {bits_needed} ビット")
-        st.write(f"色数をビットに変換：2^{bits_needed} = {colors_q1} より、ビット数は {bits_needed} です。")
-        st.write(f"**解説：** 色数が {colors_q1} = 2^{bits_needed} となるため、{bits_needed} ビットが必要です。")
+    # 問3: データ量
+    with q_cols[2]:
+        cols_num = random.choice([2,4,8,16,32])
+        w2,h2 = random.choice([(50,50),(80,80),(100,60)])
+        bits2 = cols_num.bit_length()-1
+        kb = w2*h2*bits2/8/1024
+        st.write(f"**問3:** {w2}×{h2}画素, {cols_num}色の画像のデータ量(KB)は？")
+        with st.expander("解答・解説3"):
+            st.write(f"総ビット数={w2*h2*bits2} → バイト={w2*h2*bits2/8:.2f} → KB={kb:.2f}")
 
-    # 一時ファイルの削除
-    try:
-        os.remove(in_path)
-    except:
-        pass
+    # 一時ファイル削除
+    try: os.remove(in_p)
+    except: pass
