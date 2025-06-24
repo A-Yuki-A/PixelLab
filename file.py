@@ -103,6 +103,16 @@ if uploaded:
         img_q = Image.merge("RGB", (rq, gq, bq))
         dcol.image(img_q, caption=f"{tb}ビット（各色{cb}bit）")
 
+    # ファイル形式の特徴
+    st.subheader("ファイル形式の特徴")
+    df_formats = pd.DataFrame([
+        {"拡張子": "JPG", "用途": "写真", "特徴": "非可逆圧縮で自然画像に最適"},
+        {"拡張子": "PNG", "用途": "イラスト、透過画像", "特徴": "可逆圧縮で透過対応"},
+        {"拡張子": "GIF", "用途": "アニメーション", "特徴": "可逆圧縮で256色まで"},
+        {"拡張子": "BMP", "用途": "非圧縮保存", "特徴": "シンプルな非圧縮フォーマット"},
+    ])
+    st.table(df_formats.set_index("拡張子"))
+
     # JPGとのデータ量比較
     st.subheader("JPGとのデータ量比較")
     with tempfile.NamedTemporaryFile(
@@ -131,16 +141,6 @@ if uploaded:
         })
     st.table(pd.DataFrame(rows).set_index("拡張子"))
     st.write("拡張子によってファイルサイズが違うことを確認してください。")
-
-    # ファイル形式の使われ方まとめ
-    st.subheader("ファイル形式の使われ方")
-    df_formats = pd.DataFrame([
-        {"拡張子": "JPG", "用途": "写真"},
-        {"拡張子": "PNG", "用途": "イラスト、透過画像"},
-        {"拡張子": "GIF", "用途": "アニメーション"},
-        {"拡張子": "BMP", "用途": "非圧縮保存"},
-    ])
-    st.table(df_formats.set_index("拡張子"))
 
     # 確認問題（動的出題）
     st.subheader("確認問題")
@@ -175,12 +175,3 @@ if uploaded:
     bits_needed = colors_q1.bit_length() - 1
     st.write(f"**問3:** 1画素で{colors_q1:,}色を表現するには何ビット必要ですか？")
     with st.expander("解答・解説3"):
-        st.write(f"**解答：** {bits_needed} ビット")
-        st.write(f"色数をビットに変換：2^{bits_needed} = {colors_q1} より、ビット数は {bits_needed} です。")
-        st.write(f"**解説：** 色数が {colors_q1} = 2^{bits_needed} となるため、{bits_needed} ビットが必要です。")
-
-    # 一時ファイルの削除
-    try:
-        os.remove(in_path)
-    except:
-        pass
