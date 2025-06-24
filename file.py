@@ -77,12 +77,13 @@ if uploaded:
 
     # 解像度比較
     st.subheader("解像度")
-    st.write("解像度とは1インチ（2.54cm）にいくつの画素が並んでいるかをdpiで表します。")
-    res_cols = st.columns(3)
-    for col, size in zip(res_cols, [128, 64, 16]):
-        low = img.resize((size, size), Image.BILINEAR)
-        restored = low.resize((orig_w, orig_h), Image.NEAREST)
-        col.image(restored, caption=f"{size}画素 → {orig_w}画素")
+    st.write("解像度とは1インチ（2.54cm）あたりにいくつの画素が並んでいるかをdpi（dots per inch）で表します。")
+    # 例として3つの解像度を比較
+    dpi_values = [72, 150, 300]
+    dpi_cols = st.columns(3)
+    for col, dpi in zip(dpi_cols, dpi_values):
+        # 同じ画像を表示しつつ、異なるDPIをキャプションで示す
+        col.image(img, caption=f"{dpi} DPI")
 
     # 階調（量子化ビット数）
     st.subheader("階調（量子化ビット数）")
