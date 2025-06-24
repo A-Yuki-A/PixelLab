@@ -76,16 +76,25 @@ if uploaded:
     ch_cols[2].image(blue_img, caption="B (青)")
 
     # 解像度比較
-    st.subheader("解像度")
-    st.write("解像度とは1インチ（2.54cm）あたりにいくつの画素が並んでいるかをdpi（dots per inch）で表します。")
-    # 例として3つの解像度を比較
+    st.subheader("解像度のシミュレーション")
+    st.write("DPI の違いが印刷時の滑らかさにどのように影響するかをシミュレーションします。")
     dpi_values = [72, 150, 300]
     dpi_cols = st.columns(3)
+    # 物理幅を 2 インチとしてシミュレーション
+    physical_width_inch = 2
     for col, dpi in zip(dpi_cols, dpi_values):
-        # 同じ画像を表示しつつ、異なるDPIをキャプションで示す
-        col.image(img, caption=f"{dpi} DPI")
+        # ダウンサンプルしてアップサンプル
+        target_width = int(dpi * physical_width_inch)
+        target_height = int(target_width * orig_h / orig_w)
+        small = img.resize((target_width, target_height), Image.BILINEAR)
+        restored = small.resize((orig_w, orig_h), Image.NEAREST)
+        col.image(
+            restored,
+            caption=f"{dpi} DPI で仮想的に {target_width}×{target_height} px に縮小し、元サイズに戻した場合",
+            use_column_width=True
+        )
 
-    # 階調（量子化ビット数）
+    # 階調（量子化ビット数）（量子化ビット数）
     st.subheader("階調（量子化ビット数）")
     st.write(
         "階調（量子化ビット数）はRGBそれぞれを何ビットで表現するかを表しています。"
