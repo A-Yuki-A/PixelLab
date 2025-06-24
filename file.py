@@ -161,7 +161,7 @@ if uploaded:
     total_kb = w2 * h2 * bytes_per_pixel / 1024
     st.write(f"**問2:** 色数を{colors}色、画像サイズが{w2}×{h2}画素のとき、データ量は何KBでしょうか？")
     with st.expander("解答・解説2"):
-        st.write(f"色数をビットに変換: 2^{bits} = {colors} 色なので {bits} ビット")
+        st.write(f"色数をビットに変換: 2^{bits} = {colors} 色なので {bits} ビット))
         total_bits = w2 * h2 * bits
         bytes_val = total_bits / 8
         kb_val = bytes_val / 1024
@@ -175,3 +175,12 @@ if uploaded:
     bits_needed = colors_q1.bit_length() - 1
     st.write(f"**問3:** 1画素で{colors_q1:,}色を表現するには何ビット必要ですか？")
     with st.expander("解答・解説3"):
+        st.write(f"**解答：** {bits_needed} ビット")
+        st.write(f"色数をビットに変換：2^{bits_needed} = {colors_q1} より、ビット数は {bits_needed} です。")
+        st.write(f"**解説：** 色数が {colors_q1} = 2^{bits_needed} となるため、{bits_needed} ビットが必要です。")
+
+    # 一時ファイルの削除
+    try:
+        os.remove(in_path)
+    except:
+        pass
